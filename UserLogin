@@ -1,0 +1,41 @@
+import java.util.Scanner;
+
+public class UserLogin {
+    public static void studentLogin(){
+        String file = ""; //CSV file
+
+        try {
+            Scanner input = new Scanner(System.in);
+            System.out.println("Enter your username: ");
+            String enteredUsername = input.nextLine();
+            System.out.println("Enter your password: ");
+            String enteredPassword = input.nextLine();
+
+            Scanner fileScanner = new Scanner(file);
+            boolean userExists = false;
+
+            while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine();
+                String[] cells = line.split(",");
+                if (cells.length == 2) {
+                    String username = cells[0];
+                    String password = cells[1];
+                    if (enteredUsername.equals(username) && enteredPassword.equals(password)) {
+                        userExists = true;
+                        break;
+                    }
+                }
+            }
+
+            if (userExists) {
+                //Main menu
+            } else {
+                System.out.println("Invalid username or password");
+            }
+
+            fileScanner.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
