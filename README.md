@@ -1,6 +1,4 @@
 # Java-Final-Project
-Hello
-ni hao
 private void initializeCourses() {
         String[] initialCourses = {"Foundation of Computing", "Applied Environmental Science", "Arts and Culture", "Java Programming I", "Maths for Computing"};
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(COURSE_FILE))) {
