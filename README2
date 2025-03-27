@@ -1,0 +1,23 @@
+public String removeCourse(String username, String course) {
+    List<String> allCourses = Arrays.asList(
+        "Foundation of Computing", 
+        "Applied Environmental Science", 
+        "Arts and Culture", 
+        "Java Programming I", 
+        "Maths for Computing"
+    );
+
+    if (!allCourses.contains(course)) {
+        return "Invalid course name.";
+    }
+
+    List<String> courses = readCurrentCourses(username);
+
+    if (!courses.contains(course)) {
+        return "Course not found in your registered courses.";
+    }
+
+    courses.remove(course);
+    updateStudentCourses(username, courses);
+    return "Course removed successfully.";
+}
