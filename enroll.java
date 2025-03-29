@@ -52,17 +52,17 @@ public class enroll {
 
             if (choice == 1) { // Register
                 System.out.print("Enter your username: ");
-                String username = scanner.nextLine();
+                String username = input.nextLine();
                 System.out.print("Enter your password: ");
-                String password = scanner.nextLine();
+                String password = input.nextLine();
                 student = db.addUser(username, password);
                 System.out.println("Registration successful! Please log in.");
             } 
             else if (choice == 2) { // Log In
                 System.out.print("Enter your username: ");
-                String username = scanner.nextLine();
+                String username = input.nextLine();
                 System.out.print("Enter your password: ");
-                String password = scanner.nextLine();
+                String password = input.nextLine();
                 student = db.login(username, password);
                 if (student != null) {
                     System.out.println("Login successful!");
@@ -73,7 +73,7 @@ public class enroll {
             }
             else if (choice == 3) { // Exit
                 System.out.println("Exiting program.");
-                scanner.close();
+                input.close();
                 return;
             } 
             else {
@@ -118,7 +118,7 @@ public class enroll {
             }
         }
 
-        scanner.close();
+        input.close();
     }
 }
 
