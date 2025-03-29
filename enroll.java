@@ -87,21 +87,38 @@ public class enroll {
             System.out.println("1. View Available Courses\n2. View Registered Courses\n3. Add Course\n4. Remove Course\n5. Logout\nWhat would you like to do?");
             int hubChoice = input.nextInt();
             input.nextLine(); // Consume newline
+        
+            if (hubChoice == 1) { // View all courses
+                List<String> allCourses = readAllCourses();
+                System.out.println("Available Courses: " + allCourses);
+            } 
+            else if (hubChoice == 2) { // View registered courses
+                student.showRegistered(student.getUsername());
+            } 
+            else if (hubChoice == 3) { // Register for a course
+                System.out.print("Enter course name to register: ");
+                String course = input.nextLine();
+                String result = student.getDatabase().addCourse(student.getUsername(), course);
+                System.out.println(result);
+                student.showRegistered(student.getUsername()); // Show updated courses
+            } 
+            else if (hubChoice == 4) { // Drop a course
+                System.out.print("Enter course name to drop: ");
+                String course = input.nextLine();
+                String result = student.getDatabase().removeCourse(student.getUsername(), course);
+                System.out.println(result);
+                student.showRegistered(student.getUsername()); // Show updated courses
+            } 
+            else if (hubChoice == 5) { // Logout
+                System.out.println("Logging out");
+                break; // exits the menu loop
+            }
+            else {
+                System.out.println("Invalid choice. Please try again.");
+            }
         }
 
-        if (hubChoice == 1) { // View all courses
-            List<String> allCourses = readAllCourses();
-            System.out.println("Available Courses: " + allCourses);
-        } 
-        else if (hubChoice == 2) { // View registered courses
-            student.showRegistered(student.getUsername());
-        } 
-        else if (hubChoice == 3) { // Register for a course
-            System.out.print("Enter course name to register: ");
-            String course = input.nextLine();
-            
-
-
+        scanner.close();
     }
 }
 
