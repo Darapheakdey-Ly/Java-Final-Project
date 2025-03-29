@@ -181,33 +181,19 @@ class Student {
     
     public void showRegistered(String username){
         List<String> currentCourses = database.readCurrentCourses(username);
-        //
+        System.out.println("Registered Courses: " + currentCourses);
 
     }
 
     public void addCourse(String username, String course){
-        database.addCourse(username, course);
-        //
+        System.out.println(database.addCourse(username, course));
         showRegistered(username);
         
 
     }
 
     public void deleteCourse(String username, String course){
-        database.removeCourse(username, course);
-        //
+        System.out.println(database.removeCourse(username, course));
         showRegistered(username);
-    }
-
-    public void registration(String username, String course){
-        //display all courses
-        //
-        addCourse(username,course);
-    }
-
-    public void drop(String username, String course){
-        showRegistered(username);
-        //
-        deleteCourse(username, course);
     }
 }
