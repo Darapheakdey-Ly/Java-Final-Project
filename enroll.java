@@ -93,21 +93,17 @@ public class enroll {
                 System.out.println("Available Courses: " + allCourses);
             } 
             else if (hubChoice == 2) { // View registered courses
-                student.showRegistered(student.getUsername());
+                student.showRegistered();
             } 
             else if (hubChoice == 3) { // Register for a course
                 System.out.print("Enter course name to register: ");
                 String course = input.nextLine();
-                String result = student.getDatabase().addCourse(student.getUsername(), course);
-                System.out.println(result);
-                student.showRegistered(student.getUsername()); // Show updated courses
+                student.addCourses(course);
             } 
             else if (hubChoice == 4) { // Drop a course
                 System.out.print("Enter course name to drop: ");
                 String course = input.nextLine();
-                String result = student.getDatabase().removeCourse(student.getUsername(), course);
-                System.out.println(result);
-                student.showRegistered(student.getUsername()); // Show updated courses
+                student.deleteCourses(course);
             } 
             else if (hubChoice == 5) { // Logout
                 System.out.println("Logging out");
@@ -243,20 +239,20 @@ class Student {
         this.database = database;
     }
     
-    public void showRegistered(String username){
+    public void showRegistered(){
         List<String> currentCourses = database.readCurrentCourses(username);
         System.out.println("Registered Courses: " + currentCourses);
 
     }
 
-    public void addCourse(String username, String course){
+    public void addCourse(String course){
         System.out.println(database.addCourse(username, course));
         showRegistered(username);
         
 
     }
 
-    public void deleteCourse(String username, String course){
+    public void deleteCourse(String course){
         System.out.println(database.removeCourse(username, course));
         showRegistered(username);
     }
