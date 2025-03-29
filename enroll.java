@@ -14,6 +14,7 @@ public class enroll {
         }  
     }
     public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
         //sets names and headers for the databases
         String[] databases = {"studentLogInDB.csv","studentInfo.csv"};
         String[] headers = {"ID,userName,password","ID,userName,fullName,Courses"};
@@ -44,15 +45,61 @@ public class enroll {
 
 
         while (true) { 
-            //log in loop
-            break;
+            System.out.println("===== Welcome to the Course Enrollment System =====");
+            System.out.println("1. Register\n2. Log In\n3. Quit\nPlease choose an option");
+            int choice = input.nextInt();
+            input.nextLine();
+
+            if (choice == 1) { // Register
+                System.out.print("Enter your username: ");
+                String username = scanner.nextLine();
+                System.out.print("Enter your password: ");
+                String password = scanner.nextLine();
+                student = db.addUser(username, password);
+                System.out.println("Registration successful! Please log in.");
+            } 
+            else if (choice == 2) { // Log In
+                System.out.print("Enter your username: ");
+                String username = scanner.nextLine();
+                System.out.print("Enter your password: ");
+                String password = scanner.nextLine();
+                student = db.login(username, password);
+                if (student != null) {
+                    System.out.println("Login successful!");
+                    break; // Exit loop if login is successful
+                } else {
+                    System.out.println("Invalid username or password. Please try again.");
+                }
+            }
+            else if (choice == 3) { // Exit
+                System.out.println("Exiting program.");
+                scanner.close();
+                return;
+            } 
+            else {
+                System.out.println("Invalid choice. Please try again.");
+            }
         }
 
         //if login == true:
         while (true) { 
-            //menu loop
-            break;
+            System.out.println("\n===== Student Hub =====");
+            System.out.println("1. View Available Courses\n2. View Registered Courses\n3. Add Course\n4. Remove Course\n5. Logout\nWhat would you like to do?");
+            int hubChoice = input.nextInt();
+            input.nextLine(); // Consume newline
         }
+
+        if (hubChoice == 1) { // View all courses
+            List<String> allCourses = readAllCourses();
+            System.out.println("Available Courses: " + allCourses);
+        } 
+        else if (hubChoice == 2) { // View registered courses
+            student.showRegistered(student.getUsername());
+        } 
+        else if (hubChoice == 3) { // Register for a course
+            System.out.print("Enter course name to register: ");
+            String course = input.nextLine();
+            
 
 
     }
