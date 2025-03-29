@@ -42,7 +42,7 @@ public class enroll {
         System.err.println(db.readCurrentCourses("Baba"));
         db.updateStudentCourses("fgs", allCourses);
         
-
+        Student student = null;
 
         while (true) { 
             System.out.println("===== Welcome to the Course Enrollment System =====");
