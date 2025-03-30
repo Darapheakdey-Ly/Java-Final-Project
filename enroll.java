@@ -37,10 +37,9 @@ public class enroll {
 
 
         Database db = new Database(databases);
-        Student Baba = db.addUser("Baba", "password");
+
         List<String> allCourses = readAllCourses();
-        System.err.println(db.readCurrentCourses("Baba"));
-        db.updateStudentCourses("fgs", allCourses);
+
         
         Student student = null;
 
@@ -51,12 +50,15 @@ public class enroll {
             input.nextLine();
 
             if (choice == 1) { // Register
+                System.out.print("Enter your Full Name: ");
+                String fullname = input.nextLine();
                 System.out.print("Enter your username: ");
                 String username = input.nextLine();
                 System.out.print("Enter your password: ");
                 String password = input.nextLine();
-                student = db.addUser(username, password);
-                System.out.println("Registration successful! Please log in.");
+                student = db.addUser(username, password,fullname);
+                System.out.println("Registration successful!");
+                break;
             } 
             else if (choice == 2) { // Log In
                 System.out.print("Enter your username: ");
@@ -64,7 +66,7 @@ public class enroll {
                 System.out.print("Enter your password: ");
                 String password = input.nextLine();
                 student = db.login(username, password);
-                if (student != null) {
+                if (!student.getUsername().equals("Invalid")) {
                     System.out.println("Login successful!");
                     break; // Exit loop if login is successful
                 } else {
@@ -89,7 +91,6 @@ public class enroll {
             input.nextLine(); // Consume newline
         
             if (hubChoice == 1) { // View all courses
-                List<String> allCourses = readAllCourses();
                 System.out.println("Available Courses: " + allCourses);
             } 
             else if (hubChoice == 2) { // View registered courses
@@ -98,12 +99,14 @@ public class enroll {
             else if (hubChoice == 3) { // Register for a course
                 System.out.print("Enter course name to register: ");
                 String course = input.nextLine();
-                student.addCourses(course);
+                student.addCourse(course);
             } 
             else if (hubChoice == 4) { // Drop a course
+                System.out.print("Your current courses are ");
+                student.showRegistered();
                 System.out.print("Enter course name to drop: ");
                 String course = input.nextLine();
-                student.deleteCourses(course);
+                student.deleteCourse(course);
             } 
             else if (hubChoice == 5) { // Logout
                 System.out.println("Logging out");
@@ -127,12 +130,24 @@ class Database {
         this.filePathInfo = filePath[1];
     }
     
-    public Student addUser(String username, String password) {
+    public Student addUser(String username, String password ,String FullName) {
         //writes the student information to the login database
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePathLogin,true))){
             bw.newLine();
             //implement random ID TODO
             bw.write(1 + "," + username + "," + password);
+        }
+        catch (Exception e){
+            System.err.println("ERROR: "+e.getMessage());
+            //add error msg
+            System.exit(0);
+        }
+
+        //write to studentinfo
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePathInfo,true))){
+            bw.newLine();
+            //implement random ID TODO
+            bw.write(1 + "," + username + "," + FullName);
             Student student = new Student(username, password, this);
             return student;
         }
@@ -146,14 +161,24 @@ class Database {
     
     public Student login(String username, String password) {
         try(BufferedReader br = new BufferedReader(new FileReader(filePathLogin))){
-            
+            String line;
+            while((line = br.readLine())!=null){
+                String values[] = line.split(",");
+                if(values[1].equals(username)){
+                    if(values[2].equals(password)){
+                        return new Student(username, password, this);
+                    }
+                }
+            }
+
+
         }
         catch(Exception e){
             System.err.println("ERROR: "+e.getMessage());
             //add error msg
             System.exit(0);
         }
-        return new Student(username,password, this);
+        return new Student("Invalid",password, this);
     }
     
     public List<String> readCurrentCourses(String username) {
@@ -176,19 +201,31 @@ class Database {
         return courses;
     }
     
-    public String addCourse(String username, String course){
+    public String addCourses(String username, String course){
         List<String> courses = readCurrentCourses(username);
-        if (courses.contains(course)) {
-            return "Course already registered.";
-        }
+        try{
+            if (courses.contains(course)) {
+                return "Course already registered.";
+            }}catch (Exception e){
+
+            }
         courses.add(course);
+        
         updateStudentCourses(username, courses);
+        System.out.println("asdf");
         return "Course added successfully.";
     }
 
     public String removeCourse(String username, String course){
-        //
-        return "success or failure";
+        List<String> courses = readCurrentCourses(username);
+    
+        if (!courses.contains(course)) {
+            return "Course not found in your registered courses.";
+        }
+    
+        courses.remove(course);
+        updateStudentCourses(username, courses);
+        return "Course removed successfully.";
     }
 
     public void updateStudentCourses(String username,List<String> courses){
@@ -205,10 +242,16 @@ class Database {
             e.printStackTrace();
         }
 
-        for(String[] row : data){
+        for (int i = 0; i < data.size(); i++){
+            String[] row = data.get(i);
             if(row[1].equals(username)){
-                System.out.println(Arrays.toString(row));
-                row[3] = String.join(";",courses);
+                if(row.length > 3){
+                    row[3] = String.join(";",courses);}
+                else{
+                    List<String> rowList = new ArrayList<>(Arrays.asList(row));
+                    rowList.add(String.join(";", courses));
+                    data.set(i, rowList.toArray(new String[0]));
+                }
             }
         }
 
@@ -233,6 +276,10 @@ class Student {
     private String password;
     private Database database;
     
+    public String getUsername(){
+        return username;
+    }
+
     public Student(String username, String password, Database database) {
         this.username = username;
         this.password = password;
@@ -246,14 +293,14 @@ class Student {
     }
 
     public void addCourse(String course){
-        System.out.println(database.addCourse(username, course));
-        showRegistered(username);
+        System.out.println(database.addCourses(username, course));
+        showRegistered();
         
 
     }
 
     public void deleteCourse(String course){
         System.out.println(database.removeCourse(username, course));
-        showRegistered(username);
+        showRegistered();
     }
 }
