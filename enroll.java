@@ -186,9 +186,10 @@ class Database {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePathInfo))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",", 4); // Ensure we split only into 3 parts
+                String[] data = line.split(",");
                 if (data[1].equals(username)) {
-                    if (data.length > 2 && !data[3].isEmpty()) {
+                    System.err.println("2234d");
+                    if (data.length > 3 && !data[3].isEmpty()) {
                         courses = new ArrayList<>(Arrays.asList(data[3].split(";")));
                     }
                     break;
@@ -203,6 +204,7 @@ class Database {
     
     public String addCourses(String username, String course){
         List<String> courses = readCurrentCourses(username);
+        System.err.println("2234d");
         try{
             if (courses.contains(course)) {
                 return "Course already registered.";
@@ -230,6 +232,7 @@ class Database {
 
     public void updateStudentCourses(String username,List<String> courses){
         List<String[]> data = new ArrayList<>();
+        System.err.println("2234d");
         String headers = "ID,userName,fullName,Courses";
         try(BufferedReader br = new BufferedReader(new FileReader(filePathInfo)) ){
             String line;
@@ -244,7 +247,9 @@ class Database {
 
         for (int i = 0; i < data.size(); i++){
             String[] row = data.get(i);
+            
             if(row[1].equals(username)){
+                System.err.println("2234d");
                 if(row.length > 3){
                     row[3] = String.join(";",courses);}
                 else{
@@ -256,12 +261,12 @@ class Database {
         }
 
         try(BufferedWriter bw = new BufferedWriter(new FileWriter(filePathInfo))){
-            bw.write(headers);
-            bw.newLine();
 
-            for(String[] row : data){
-                bw.write(String.join(",",row));
-                bw.newLine();
+            for(int i = 0; i < data.size(); i++){
+                bw.write(String.join(",",data.get(i)));
+                if (i < data.size() - 1) {
+                    bw.newLine();
+                }  
             }
         }catch (Exception e){
             e.printStackTrace();
