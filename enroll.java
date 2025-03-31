@@ -6,7 +6,7 @@ import java.util.*;
 
 public class enroll {
     //reads all courses in the courses file
-    private static List<String> readAllCourses(){
+    public static List<String> readAllCourses(){
         try (BufferedReader br = new BufferedReader(new FileReader("courses.csv"))) {
             return Arrays.asList(br.readLine().split(","));
         } catch (IOException e) {
@@ -43,77 +43,128 @@ public class enroll {
         
         Student student = null;
 
-        while (true) { 
+        OUTER: 
+        while (true) {
             System.out.println("===== Welcome to the Course Enrollment System =====");
             System.out.println("1. Register\n2. Log In\n3. Quit\nPlease choose an option");
             int choice = input.nextInt();
             input.nextLine();
-
-            if (choice == 1) { // Register
-                System.out.print("Enter your Full Name: ");
-                String fullname = input.nextLine();
-                System.out.print("Enter your username: ");
-                String username = input.nextLine();
-                System.out.print("Enter your password: ");
-                String password = input.nextLine();
-                student = db.addUser(username, password,fullname);
-                System.out.println("Registration successful!");
-                break;
-            } 
-            else if (choice == 2) { // Log In
-                System.out.print("Enter your username: ");
-                String username = input.nextLine();
-                System.out.print("Enter your password: ");
-                String password = input.nextLine();
-                student = db.login(username, password);
-                if (!student.getUsername().equals("Invalid")) {
-                    System.out.println("Login successful!");
-                    break; // Exit loop if login is successful
-                } else {
-                    System.out.println("Invalid username or password. Please try again.");
-                }
-            }
-            else if (choice == 3) { // Exit
-                System.out.println("Exiting program.");
-                input.close();
-                return;
-            } 
-            else {
-                System.out.println("Invalid choice. Please try again.");
+            switch (choice) {
+                case 1:
+                    {
+                        // Register
+                        System.out.print("Enter your Full Name: ");
+                        String fullname = input.nextLine();
+                        System.out.print("Enter your username: ");
+                        String username = input.nextLine();
+                        System.out.print("Enter your password: ");
+                        String password = input.nextLine();
+                        student = db.addUser(username, password,fullname);
+                        System.out.println("Registration successful!");
+                        System.out.print("Press ENTER to Continue...");
+                        input.nextLine();
+                        break OUTER;
+                    }
+                case 2:
+                    {
+                        // Log In
+                        System.out.print("Enter your username: ");
+                        String username = input.nextLine();
+                        System.out.print("Enter your password: ");
+                        String password = input.nextLine();
+                        student = db.login(username, password);
+                        if (!student.getUsername().equals("Invalid")) {
+                            System.out.println("Login successful!");
+                            break OUTER; // Exit loop if login is successful
+                        } else {
+                            System.out.println("Invalid username or password. Please try again.");
+                            System.out.print("Press ENTER to Continue...");
+                            input.nextLine();
+                        }
+                        break;
+                    }
+                case 3:
+                    // Exit
+                    System.out.println("Exiting program.");
+                    input.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+                    System.out.print("Press ENTER to Continue...");
+                    input.nextLine();
+                    break;
             }
         }
 
-        //if login == true:
+        OUTER_1:
         while (true) { 
             System.out.println("\n===== Student Hub =====");
             System.out.println("1. View Available Courses\n2. View Registered Courses\n3. Add Course\n4. Remove Course\n5. Logout\nWhat would you like to do?");
             int hubChoice = input.nextInt();
-            input.nextLine(); // Consume newline
-        
-            if (hubChoice == 1) { // View all courses
-                System.out.println("Available Courses: " + allCourses);
-            } 
-            else if (hubChoice == 2) { // View registered courses
-                student.showRegistered();
-            } 
-            else if (hubChoice == 3) { // Register for a course
-                System.out.print("Enter course name to register: ");
-                String course = input.nextLine();
-                student.addCourse(course);
-            } 
-            else if (hubChoice == 4) { // Drop a course
-                System.out.print("Your current courses are ");
-                student.showRegistered();
-                System.out.print("Enter course name to drop: ");
-                String course = input.nextLine();
-                student.deleteCourse(course);
-            } 
-            else if (hubChoice == 5) { // Logout
-                System.out.println("Logging out");
-                break; // exits the menu loop
-            }
-            else {
-                System.out.println("Invalid choice. Please try again.");
+            input.nextLine();
+            switch (hubChoice) {
+                case 1:
+                    // View all courses
+                    System.out.println("Available Courses: ");
+                    int count = 0;
+                    for (String course : allCourses) {
+                        System.out.printf("%-50s", course);
+                        count++;
+
+                        if (count % 4 == 0) {
+                            System.out.println();
+                        }
+                    }
+                    System.out.print("Press ENTER to Continue...");
+                    input.nextLine();
+                    break;
+                case 2:
+                    // View registered courses
+                    System.out.println("Your Current Courses Are:");
+                    student.showRegistered();
+                    System.out.print("Press ENTER to Continue...");
+                    input.nextLine();
+                    break;
+                case 3:
+                    {
+                        // Register for a course
+
+                        System.out.println("Available Courses: ");
+                        count = 0;
+                        for (String course : allCourses) {
+                            System.out.printf("%-50s", course);
+                            count++;
+    
+                            if (count % 4 == 0) {
+                                System.out.println();
+                            }
+                        }
+                        System.out.print("Enter course name to register: ");
+                        String course = input.nextLine();
+                        student.addCourse(course);
+                        System.out.print("Press ENTER to Continue...");
+                        input.nextLine();
+                        break;
+                    }
+                case 4:
+                    {
+                        // Drop a course
+                        System.out.print("Your current courses are ");
+                        student.showRegistered();
+                        System.out.print("Enter course name to drop: ");
+                        String course = input.nextLine();
+                        student.deleteCourse(course);
+                        System.out.print("Press ENTER to Continue...");
+                        input.nextLine();
+                        break;
+                    }
+                case 5:
+                    // Logout
+                    System.out.println("Logging out");
+                    break OUTER_1; // exits the menu loop
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+                    break;
             }
         }
 
@@ -131,11 +182,12 @@ class Database {
     }
     
     public Student addUser(String username, String password ,String FullName) {
+        Random random = new Random();
+        int ID = 1000000 + random.nextInt(9000000);
         //writes the student information to the login database
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePathLogin,true))){
             bw.newLine();
-            //implement random ID TODO
-            bw.write(1 + "," + username + "," + password);
+            bw.write(ID + "," + username + "," + password);
         }
         catch (Exception e){
             System.err.println("ERROR: "+e.getMessage());
@@ -146,14 +198,12 @@ class Database {
         //write to studentinfo
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePathInfo,true))){
             bw.newLine();
-            //implement random ID TODO
-            bw.write(1 + "," + username + "," + FullName);
+            bw.write(ID + "," + username + "," + FullName);
             Student student = new Student(username, password, this);
             return student;
         }
         catch (Exception e){
             System.err.println("ERROR: "+e.getMessage());
-            //add error msg
             System.exit(0);
         }
         return new Student(username,password, this);
@@ -175,7 +225,6 @@ class Database {
         }
         catch(Exception e){
             System.err.println("ERROR: "+e.getMessage());
-            //add error msg
             System.exit(0);
         }
         return new Student("Invalid",password, this);
@@ -188,7 +237,6 @@ class Database {
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
                 if (data[1].equals(username)) {
-                    System.err.println("2234d");
                     if (data.length > 3 && !data[3].isEmpty()) {
                         courses = new ArrayList<>(Arrays.asList(data[3].split(";")));
                     }
@@ -204,7 +252,6 @@ class Database {
     
     public String addCourses(String username, String course){
         List<String> courses = readCurrentCourses(username);
-        System.err.println("2234d");
         try{
             if (courses.contains(course)) {
                 return "Course already registered.";
@@ -214,8 +261,7 @@ class Database {
         courses.add(course);
         
         updateStudentCourses(username, courses);
-        System.out.println("asdf");
-        return "Course added successfully.";
+        return "\nCourse added successfully.";
     }
 
     public String removeCourse(String username, String course){
@@ -232,7 +278,6 @@ class Database {
 
     public void updateStudentCourses(String username,List<String> courses){
         List<String[]> data = new ArrayList<>();
-        System.err.println("2234d");
         String headers = "ID,userName,fullName,Courses";
         try(BufferedReader br = new BufferedReader(new FileReader(filePathInfo)) ){
             String line;
@@ -249,7 +294,6 @@ class Database {
             String[] row = data.get(i);
             
             if(row[1].equals(username)){
-                System.err.println("2234d");
                 if(row.length > 3){
                     row[3] = String.join(";",courses);}
                 else{
@@ -293,19 +337,39 @@ class Student {
     
     public void showRegistered(){
         List<String> currentCourses = database.readCurrentCourses(username);
-        System.out.println("Registered Courses: " + currentCourses);
+        System.out.println("Registered Courses: " );
+        int count = 0;
+        for (String course : currentCourses) {
+            System.out.printf("%-50s", course);
+            count++;
 
+            if (count % 4 == 0) {
+                System.out.println();
+            }
+        }
+        System.out.println("");
+        System.out.println("");
     }
 
     public void addCourse(String course){
+        List<String> allcourse = enroll.readAllCourses();
+        if(!allcourse.contains(course)){
+            System.out.println("Course not available...");
+        }
+        else{
         System.out.println(database.addCourses(username, course));
-        showRegistered();
+        System.out.println("");
+        showRegistered();}
+        System.out.println("");
         
 
     }
 
     public void deleteCourse(String course){
         System.out.println(database.removeCourse(username, course));
+        System.out.println("");
+        System.out.println("Your current courses are: ");
         showRegistered();
+        System.out.println("");
     }
 }
