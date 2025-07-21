@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ public class StudentLogin {
             String sql = String.format("""
             CREATE TABLE IF NOT EXISTS students%d (
                 email TEXT NOT NULL UNIQUE,
-                password INTEGER
+                password TEXT NOT NULL,
             );
             """,i);
             try (Connection conn = DriverManager.getConnection(url);
@@ -45,6 +46,36 @@ public class StudentLogin {
         }
 
         return null;
+    }
+
+    //to be changed to returning student object possibly
+    public boolean login(String email, String password){
+        Integer[] studentHash = studentHash(email);
+        System.out.println(Arrays.toString(studentHash));
+        //to be implemented, method for checking invalid email
+        String sql = String.format("SELECT * FROM students%d WHERE rowid = ?", studentHash[0]);
+        String trueEmail = "";
+        String truePassword = "";
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, studentHash[1]);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                trueEmail = rs.getString("email");
+                truePassword = rs.getString("password");
+            } else {
+                System.out.println("No entry found with rowid " + studentHash[1]);
+                return false;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return trueEmail.equals(email) && truePassword.equals(password);
     }
 
     //to be moved to admin only
@@ -91,9 +122,13 @@ public class StudentLogin {
 
 
         StudentLogin studentLogin = new StudentLogin();
-        Integer[] hash = studentLogin.studentHash("2024116@aupp.edu.au");
+        Integer[] hash = studentLogin.studentHash("2025001smith@aupp.edu.kh");
         System.out.println(hash[0] + " " + hash[1]);
 
-        studentLogin.addStudent("John", "Doe", "Smith","CSA");
+        boolean login = studentLogin.login("2025002smith@aupp.edu.kh", "23a07ee62084");
+
+        System.out.println(login);
+
+        //studentLogin.addStudent("John", "Doe", "Smith","CSA");
     }
 }
