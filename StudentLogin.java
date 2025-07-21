@@ -1,6 +1,7 @@
 import java.sql.*;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Scanner;
 import java.util.UUID;
 
 public class StudentLogin {
@@ -20,7 +21,7 @@ public class StudentLogin {
             String sql = String.format("""
             CREATE TABLE IF NOT EXISTS students%d (
                 email TEXT NOT NULL UNIQUE,
-                password TEXT NOT NULL,
+                password TEXT NOT NULL
             );
             """,i);
             try (Connection conn = DriverManager.getConnection(url);
@@ -79,7 +80,9 @@ public class StudentLogin {
     }
 
     //to be moved to admin only
-    public void addStudent(String firstName, String DOB, String lastName, String major){
+    public void addStudent(String firstName, String DOB, String lastName, String major, int phone){
+        final String url2 = "jdbc:sqlite:studentData.db";
+
         String uuid = UUID.randomUUID().toString();
         String password = uuid.replaceAll("-", "").substring(0, 12); // 12-char password
 
@@ -116,11 +119,36 @@ public class StudentLogin {
             e.printStackTrace();
         }
 
+        sql = String.format("INSERT INTO students%s (id, email, major, firstname, lastname, dob, enrolledyear, phone, status) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",currentYear);
+
+        try (Connection conn = DriverManager.getConnection(url2);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, currentYear+String.format("%03d", counter + 1));
+            pstmt.setString(2, email);
+            pstmt.setString(3, major);
+            pstmt.setString(4, firstName);
+            pstmt.setString(5, lastName);
+            pstmt.setString(6, DOB);
+            pstmt.setInt(7, Integer.parseInt(currentYear));
+            pstmt.setInt(8, phone);
+            pstmt.setString(9, "true");
+
+            int rowsInserted = pstmt.executeUpdate();
+
+            System.out.println("Rows inserted: " + rowsInserted);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Successfully added student in database.");
+        System.out.println("Your email is: " + email + " Your password is: " + password);
     }
 
     public static void main(String[] args) throws SQLException {
 
-
+        Scanner input = new Scanner(System.in);
         StudentLogin studentLogin = new StudentLogin();
         Integer[] hash = studentLogin.studentHash("2025001smith@aupp.edu.kh");
         System.out.println(hash[0] + " " + hash[1]);
@@ -130,5 +158,21 @@ public class StudentLogin {
         System.out.println(login);
 
         //studentLogin.addStudent("John", "Doe", "Smith","CSA");
+
+        System.out.println("Enter your first name: ");
+        String firstName = input.nextLine();
+        System.out.println("Enter your last name: ");
+        String lastName = input.nextLine();
+        System.out.println("Enter your major: ");
+        String major = input.nextLine();
+        System.out.println("Enter your DOB: ");
+        String DOB = input.nextLine();
+        System.out.println("Enter your pphone: ");
+        int phone = input.nextInt();input.nextLine();
+
+        Database database = new Database();
+        studentLogin.addStudent(firstName, DOB, lastName, major, phone);
+
+
     }
 }
